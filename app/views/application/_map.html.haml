@@ -1,0 +1,5 @@
+- content_for :scripts do
+  = javascript_include_tag  'http://maps.google.com/maps/api/js?sensor=false',
+                            'http://code.google.com/apis/gears/gears_init.js'
+#map-canvas
+= hidden_field_tag :coords, @coords, :id => 'coords' unless @coords.nil?

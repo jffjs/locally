@@ -1,0 +1,5 @@
+#map-search
+  = form_tag '/questions', :method => :get, :remote => true do
+    = search_field_tag :location, "Change location", :id => 'map-search-input'
+    = hidden_field_tag :new_coords
+    = submit_tag "Search", :id => 'map-search-submit'

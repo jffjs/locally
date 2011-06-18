@@ -1,0 +1,3 @@
+%ul
+  - @questions.each do |question|
+    %li= link_to question.content, question_pretty_path(question)
