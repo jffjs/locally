@@ -16,7 +16,7 @@ describe User do
     end
 
     it "should require username to be unique" do
-      another_user = Factory.build(:user, :username => "test")
+      another_user = Fabricate.build(:user, :username => "test")
       user.should_not be_valid
     end
 
@@ -26,7 +26,7 @@ describe User do
     end
 
     it "should require email to be unique" do
-      another_user = Factory.build(:user, :email => "test@test.com")
+      another_user = Fabricate.build(:user, :email => "test@test.com")
       user.should_not be_valid
     end
 

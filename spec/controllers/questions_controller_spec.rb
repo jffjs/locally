@@ -32,16 +32,23 @@ describe QuestionsController do
       assigns[:questions].should == questions
     end
     
-    context "when params[:new_coords] exists" do
+    context "when params[:location] exists" do
       before do
-        get :index, :new_coords => coords, :location => "Lansing, MI"
+        Geokit::Geocoders::GoogleGeocoder.stub_chain(:geocode, :ll, :split)
+          .and_return(coords.split(','))
       end
       
+      it "should invoke the Google geocoder" do
+        Geokit::Geocoders::GoogleGeocoder.should_receive(:geocode).with("Lansing, MI")
+        get :index, :location => "Lansing, MI"
+      end
       it "assigns @coords" do
+        get :index, :location => "Lansing, MI"
         assigns[:coords].should == coords.split(',')
       end
       
       it "assigns @location" do
+        get :index, :location => "Lansing, MI"
         assigns[:location].should == "Lansing, MI"
       end
     end
@@ -94,6 +101,10 @@ describe QuestionsController do
   end
   
   describe "GET new" do
+    before do
+      controller.stub(:authenticate_user!).and_return(true)
+    end
+    
     it "should be successful" do
       get :new
       response.should be_success
@@ -115,10 +126,18 @@ describe QuestionsController do
       get :new
       assigns[:coords].should == coords
     end
+    
+    context "when params[:coords] exists" do
+      it "assigns @coords to the coords parameter" do
+        get :new, :coords => coords
+        assigns[:coords].should == coords.split(',')
+      end
+    end
   end
   
   describe "POST create" do
     before do
+      controller.stub(:authenticate_user!).and_return(true)
       @attr = { 'content' => "Where can I buy a pogo stick?" }
       Question.stub(:new).and_return(question)
     end
@@ -164,6 +183,7 @@ describe QuestionsController do
   
   describe "GET edit" do
     before do
+      controller.stub(:authenticate_user!).and_return(true)
       Question.stub(:where).and_return(question)
     end
     

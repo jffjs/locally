@@ -6,13 +6,12 @@ describe AnswersController do
   let(:current_user)  { mock_model(User).as_null_object }
   
   before do
+    controller.stub(:authenticate_user!).and_return(true)
     controller.stub(:current_user).and_return(current_user)
   end
   
   describe "POST create" do
     before do
-      controller.stub(:question_pretty_path)
-        .and_return(question_path(:sequence => question.sequence, :slug => question.slug))
       @attr = {'content' => "This is an answer"}
       Question.stub(:where).and_return(question)
     end
