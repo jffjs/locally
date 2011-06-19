@@ -40,6 +40,7 @@ group :test do
   gem 'autotest-growl'
   gem 'autotest-fsevent'
   gem 'factory_girl_rails'
+  gem 'fabrication'
 end
 
 group :test, :development do

@@ -1,9 +1,13 @@
+// Initialize the map and set up the controls
 $(function() {
   var mapOptions = {
     zoom: 11,
     mapTypeId: google.maps.MapTypeId.ROADMAP
   };
-  var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+	
+	// Set the map to a window property so we can access it globally
+  window.map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+	var map = window.map;
 
   if ($('#coords').size() > 0) {
     var coordsArray = $('#coords').val().split(' ');
@@ -14,24 +18,6 @@ $(function() {
   }
 
   setMapControls(map);
-
-  var locSearchInitialFocus = true;
-  $('#map-search-input').focus(function() {
-    if(locSearchInitialFocus) {
-      $(this).val('');
-      locSearchInitialFocus = false;
-    }
-  });
-
-  $('#map-search form').submit(function() {
-    geoCode($('#map-search-input').val());
-    //return false; // don't actually submit the form
-  });
-
-  $('#new_question').submit(function() {
-    var coord = map.getCenter().lat() + "," + map.getCenter().lng();
-    $('#question_coords').val(coord);
-  });
 
   function geoLocate() {
     var initialLocation;
@@ -71,15 +57,5 @@ $(function() {
   function setMapControls(map) {
     var searchControl = $('#map-search').get(0);
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchControl);
-  }
-
-  function geoCode(location) {
-    var geocoder = new google.maps.Geocoder();
-    geocoder.geocode( { 'address': location}, function(results, status) {
-      if(status == google.maps.GeocoderStatus.OK) {
-        map.setCenter(results[0].geometry.location);
-        $('#new_coords').val(map.center.lat() + ',' + map.center.lng());
-      }
-    });
   }
 });

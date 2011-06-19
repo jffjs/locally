@@ -1,0 +1,2 @@
+$("h2#heading").text("Questions in <%= @location %>");
+$("#questions-list ul").replaceWith("<%= escape_javascript(render(:partial => 'questions/list'))%>");

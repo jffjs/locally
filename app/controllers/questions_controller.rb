@@ -1,10 +1,10 @@
 class QuestionsController < ApplicationController
-  include QuestionsHelper
+  before_filter :authenticate_user!, :except => [:index, :show]
   
   # GET /questions
   def index
-    if params[:new_coords]
-      @coords = params[:new_coords].split(',')
+    if params[:location]
+      @coords = Geokit::Geocoders::GoogleGeocoder.geocode(params[:location]).ll.split(',')
       @location = params[:location]
     elsif user_signed_in?
       @coords = current_user.coords
@@ -17,7 +17,7 @@ class QuestionsController < ApplicationController
     end
     
     #TODO: make a scope for this query
-    @questions = Question.where(:coords.nearMax => [@coords, 2])
+    @questions = Question.where(:coords.nearMax => [@coords, 1])
     
     respond_to do |format|
       format.html
@@ -48,8 +48,13 @@ class QuestionsController < ApplicationController
   
   # GET /questions/new
   def new
+    if params[:coords]
+      @coords = params[:coords].split(',')
+    else
+      @coords = current_user.coords
+    end
+    
     @question = Question.new
-    @coords = current_user.coords
 
     respond_to do |format|
       format.html
