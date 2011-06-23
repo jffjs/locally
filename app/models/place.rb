@@ -11,5 +11,6 @@ class Place
   field :foursquare_id
   
   def self.find_by_google
+    @client ||= GooglePlaces::Client.new('AIzaSyAfmQSf_woizu1OtMiZPP0uGzRvpVv4k2c')
   end
 end
