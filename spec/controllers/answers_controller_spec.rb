@@ -22,7 +22,10 @@ describe AnswersController do
     end
     
     it "adds the Answer to the Question" do
-      pending "Make this better"
+      answers = [answer]
+      question.should_receive(:answers).and_return(answers)
+      answers.should_receive(:build).with(@attr)
+      post :create, :answer => @attr, :question_id => question.id
     end
     
     it "adds the current user to the list of question answerers" do

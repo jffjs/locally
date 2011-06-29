@@ -1,0 +1,12 @@
+$("#places-list ul").replaceWith("<%= escape_javascript(render(:partial => 'places/list'))%>");
+var map = window.map;
+for(i in map.markers) {
+	map.markers[i].setMap(null);
+}
+<% @places.each do |place| %>
+	map.markers.push(new google.maps.Marker({
+		position: new google.maps.LatLng(<%= place.coords[0] %>,<%= place.coords[1] %>),
+		map: map,
+		title: "<%= place.name %>"
+	}));
+<% end %>

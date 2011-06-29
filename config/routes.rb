@@ -4,10 +4,11 @@ Locally::Application.routes.draw do
   match 'home' => 'pages#index', :as => 'home'
   
   resources :questions, :except => [:show]
+  
   match 'questions/:sequence/:slug' => 'questions#show', :as => 'question'
   
-  resources :answers,   :only => [:create, :destroy]
   resources :places,    :only => [:index]
+  resources :answers,   :only => [:create, :destroy]
   
   root :to => 'questions#index'
   

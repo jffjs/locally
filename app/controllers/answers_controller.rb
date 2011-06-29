@@ -7,7 +7,6 @@ class AnswersController < ApplicationController
     # May need to find a more efficient way of doing this
     @question = Question.where(:sequence => params[:question_id]).first
     @question.answers.build(params[:answer])
-
     @question.answerers << current_user
     current_user.answered_questions << @question
 

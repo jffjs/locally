@@ -1,10 +1,12 @@
 $ ->
 	mapOptions = { zoom: 11, mapTypeId: google.maps.MapTypeId.ROADMAP }
 	# Set the map to a window property so we can access it globally
-	map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
+	window.map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
+	window.map.markers = []
+	map = window.map
 	
 	if $('#coords').size() > 0
-		coordsArray = $('#coords').val().split(' ')
+		coordsArray = $('#coords').val().split(',')
 		location = new google.maps.LatLng(coordsArray[0], coordsArray[1])
 		map.setCenter(location)
 	else

@@ -2,4 +2,4 @@
   = javascript_include_tag  'http://maps.google.com/maps/api/js?sensor=false',
                             'http://code.google.com/apis/gears/gears_init.js'
 #map-canvas
-= hidden_field_tag :coords, @coords, :id => 'coords' unless @coords.nil?
+= hidden_field_tag :coords, coords_to_string(@coords), :id => 'coords' unless @coords.nil?

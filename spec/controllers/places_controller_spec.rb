@@ -11,7 +11,7 @@ describe PlacesController do
     end
     
     it "finds nearby places by keyword" do
-      Place.should_receive(:find_by_google).with("80.0", "-50.0", :query => "italian")
+      Place.should_receive(:find_by_google).with("80.0", "-50.0", :name => "italian")
       get :index, :ll => coords, :q => "italian"
     end
     
