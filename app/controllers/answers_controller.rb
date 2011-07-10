@@ -3,10 +3,12 @@ class AnswersController < ApplicationController
   
   # POST /answers
   def create
-    # Refactor this to nest answers in questions
-    # May need to find a more efficient way of doing this
     @question = Question.where(:sequence => params[:question_id]).first
-    @question.answers.build(params[:answer])
+    answer = Answer.new(params[:answer])
+    # Look up Place by reference and add it to the answer
+    place = Place.find_by_google_ref(params[:place_ref])
+    answer.place = place
+    @question.answers << answer
     @question.answerers << current_user
     current_user.answered_questions << @question
 

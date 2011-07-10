@@ -3,6 +3,7 @@ require 'spec_helper'
 describe AnswersController do
   let(:question)      { mock_model(Question).as_null_object }
   let(:answer)        { mock_model(Answer).as_null_object }
+  let(:place)         { mock_model(Place).as_null_object }
   let(:current_user)  { mock_model(User).as_null_object }
   
   before do
@@ -13,7 +14,9 @@ describe AnswersController do
   describe "POST create" do
     before do
       @attr = {'content' => "This is an answer"}
+      @params = {:answer => @attr, :question_id => question.id, :place_ref => 'reference'}
       Question.stub(:where).and_return(question)
+      Place.stub(:find_by_google_ref).and_return(place)
     end
     
     it "finds the related question" do
@@ -23,11 +26,16 @@ describe AnswersController do
     
     it "adds the Answer to the Question" do
       answers = [answer]
-      question.should_receive(:answers).and_return(answers)
-      answers.should_receive(:build).with(@attr)
+      question.stub(:answers).and_return(answers)
       post :create, :answer => @attr, :question_id => question.id
+      answers.size.should == 2
     end
     
+    it "finds the referenced Place" do
+      Place.should_receive(:find_by_google_ref).with('reference')
+      post :create, @params
+    end
+      
     it "adds the current user to the list of question answerers" do
       question.stub(:answerers).and_return([])
       question.answerers.should_receive(:<<).with(current_user)

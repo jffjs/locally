@@ -1,4 +1,7 @@
 %ul
   - if @places
     - @places.each do |place|
-      %li= place.name
+      %li
+        = place.name
+        = radio_button_tag('places', place.google_reference)
+        / selecting a place needs to set the place for the answer

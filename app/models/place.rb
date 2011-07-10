@@ -2,6 +2,7 @@ class Place
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  has_many :answers
   field :coords,  :type => Array, :geo => true
   field :name
   field :full_address
@@ -18,5 +19,15 @@ class Place
                :google_id => place.id,
                :google_reference => place.reference)
     end
+  end
+  
+  def self.find_by_google_ref(ref)
+    @client = GooglePlaces::Client.new('AIzaSyAfmQSf_woizu1OtMiZPP0uGzRvpVv4k2c')
+    place = @client.spot(ref)
+    self.new(:name => place.name,
+             :coords => "#{place.lat},#{place.lng}",
+             :google_id => place.id,
+             :google_reference => ref,
+             :full_address => place.formatted_address)
   end
 end

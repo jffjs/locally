@@ -10,3 +10,8 @@ for(i in map.markers) {
 		title: "<%= place.name %>"
 	}));
 <% end %>
+
+// set the answer's place to the selected place
+$("input[name='places']").change(function() {
+	$("#selected-place #place_ref").val($(this).val());
+});

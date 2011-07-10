@@ -4,6 +4,6 @@ class Answer
   
   field :content  # for test purposes now
   field :user
-  embeds_one  :place
+  belongs_to  :place
   embedded_in :question,  :inverse_of => :answers
 end

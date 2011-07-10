@@ -3,14 +3,16 @@
 = form_for @new_answer do |f|
   = hidden_field_tag :question_id, @question.sequence
   = f.text_field  :content
+  #selected-place
+    = hidden_field_tag :place_ref
   = f.submit  "Answer"
 = form_tag places_path, :method => :get, :remote => true do
   = label_tag "Add a place:"
   = search_field_tag :q, nil, :id => 'place-search-input'
   = hidden_field_tag :ll, coords_to_string(@question.coords)
-  = submit_tag "Search"
-#places-list
-  = render :partial => 'places/list'
+  = submit_tag "Search", :id => 'place-search-submit'
+  #places-list
+    = render :partial => 'places/list'
 %ul
   - @answers.each do |answer|
     %li= answer.content
