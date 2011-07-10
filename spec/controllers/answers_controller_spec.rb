@@ -15,37 +15,19 @@ describe AnswersController do
     before do
       @attr = {'content' => "This is an answer"}
       @params = {:answer => @attr, :question_id => question.id, :place_ref => 'reference'}
-      Question.stub(:where).and_return(question)
+      Question.stub(:find).and_return(question)
       Place.stub(:find_by_google_ref).and_return(place)
     end
     
     it "finds the related question" do
-      Question.should_receive(:where).with(:sequence => question.id)
+      Question.should_receive(:find).with(question.id)
       post :create, :answer => @attr, :question_id => question.id
-    end
-    
-    it "adds the Answer to the Question" do
-      answers = [answer]
-      question.stub(:answers).and_return(answers)
-      post :create, :answer => @attr, :question_id => question.id
-      answers.size.should == 2
     end
     
     it "finds the referenced Place" do
       Place.should_receive(:find_by_google_ref).with('reference')
       post :create, @params
     end
-      
-    it "adds the current user to the list of question answerers" do
-      question.stub(:answerers).and_return([])
-      question.answerers.should_receive(:<<).with(current_user)
-      post :create, :answer => @attr, :question_id => question.id
-    end
     
-    it "adds the question to the user's list of answered questions" do
-      current_user.stub(:answered_questions).and_return([])
-      current_user.answered_questions.should_receive(:<<).with(question)
-      post :create, :answer => @attr, :question_id => question.id
-    end
   end
 end

@@ -1,23 +1,25 @@
-class Place
-  include Mongoid::Document
-  include Mongoid::Timestamps
-
+class Place < ActiveRecord::Base
   has_many :answers
-  field :coords,  :type => Array, :geo => true
-  field :name
-  field :full_address
-  field :google_id
-  field :google_reference
-  geo_index :coords   # need to create the index manually in console: Place.create_index!
+  geocoded_by :full_address
+  
+  # We may need the google reference, but don't want to persist it as it is not stable
+  def google_reference
+    @ref
+  end
+  
+  def google_reference=(value)
+    @ref = value
+  end
   
   def self.find_by_google(lat, lng, opt={})
     @client = GooglePlaces::Client.new('AIzaSyAfmQSf_woizu1OtMiZPP0uGzRvpVv4k2c')
     places = @client.spots(lat, lng, opt)
     places.map do |place|
       self.new(:name => place.name,
-               :coords => "#{place.lat},#{place.lng}",
-               :google_id => place.id,
-               :google_reference => place.reference)
+               :latitude => place.lat,
+               :longitude => place.lng,
+               :google_reference => place.reference,
+               :google_id => place.id)
     end
   end
   
@@ -25,9 +27,9 @@ class Place
     @client = GooglePlaces::Client.new('AIzaSyAfmQSf_woizu1OtMiZPP0uGzRvpVv4k2c')
     place = @client.spot(ref)
     self.new(:name => place.name,
-             :coords => "#{place.lat},#{place.lng}",
+             :latitude => place.lat,
+             :longitude => place.lng,
              :google_id => place.id,
-             :google_reference => ref,
              :full_address => place.formatted_address)
   end
 end

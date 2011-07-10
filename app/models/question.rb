@@ -1,21 +1,21 @@
-class Question
-  include Mongoid::Document
-  include Mongoid::Timestamps
-  extend  Mongoid::Geo::Near
-
-  field :content, :type => String
-  field :slug,    :type => String
-  field :coords,  :type => Array, :geo => true
-  geo_index :coords   # need to create the index manually in console: Question.create_index!
-  auto_increment :sequence
-  key :sequence
+class Question < ActiveRecord::Base
+  has_many :answers, :dependent => :destroy
+  belongs_to  :user
+  has_many :answerers, :through => :answers, :source => :user
+  geocoded_by :location
   
-  embeds_many :answers
-  referenced_in :user, :inverse_of => :asked_questions
-  references_and_referenced_in_many :answerers, :class_name => "User", :inverse_of => :answered_questions
-
   validates :content, :presence => true
-  before_save   :generate_slug
+  before_save :generate_slug
+  
+  def ll
+    "#{latitude},#{longitude}" if geocoded?
+  end
+  
+  def ll=(value)
+    coords = value.split(/ |,/)
+    self.latitude = coords[0].to_f
+    self.longitude = coords[1].to_f
+  end
   
   protected
   

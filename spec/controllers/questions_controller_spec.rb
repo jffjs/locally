@@ -3,39 +3,30 @@ require 'spec_helper'
 describe QuestionsController do
   let(:question) { mock_model(Question).as_null_object }
   let(:current_user) { mock_model(User).as_null_object }
-  let(:coords) { "80.0, -50.0" }
+  let(:coords) { "80.0,50.0" }
   
   before do
     controller.stub(:current_user).and_return(current_user)
   end
   
   describe "GET index" do
-    it "should be successful" do
-      get :index
-      response.should be_success
-    end
-    
-    it "renders the correct template" do
-      get :index
-      response.should render_template(:index)
-    end
     
     it "finds nearby Questions" do
-      Question.should_receive(:where)
+      Question.should_receive(:near)
       get :index
     end
     
     it "assigns @questions" do
       questions = [question]
-      Question.stub(:where).and_return(questions)
+      Question.stub(:near).and_return(questions)
       get :index
       assigns[:questions].should == questions
     end
     
     context "when params[:location] exists" do
       before do
-        Geokit::Geocoders::GoogleGeocoder.stub_chain(:geocode, :ll, :split)
-          .and_return(coords.split(','))
+        Geokit::Geocoders::GoogleGeocoder.stub_chain(:geocode, :ll)
+          .and_return(coords)
       end
       
       it "should invoke the Google geocoder" do
@@ -44,7 +35,7 @@ describe QuestionsController do
       end
       it "assigns @coords" do
         get :index, :location => "Lansing, MI"
-        assigns[:coords].should == coords.split(',')
+        assigns[:coords].should == coords
       end
       
       it "assigns @location" do
@@ -56,10 +47,10 @@ describe QuestionsController do
     context "when params[:new_coords] does not exist and a user is signed in" do
       before do
         controller.stub(:user_signed_in?).and_return(true)
+        current_user.stub(:ll).and_return(coords)
       end
       
       it "assigns @coords" do
-        current_user.stub(:coords).and_return(coords)
         get :index
         assigns[:coords].should == coords
       end
@@ -77,6 +68,7 @@ describe QuestionsController do
       before do
         controller.stub(:user_signed_in?).and_return(false)
         Geokit::Geocoders::IpGeocoder.stub(:geocode).and_return(location)
+        location.stub(:ll).and_return(coords)
       end
       
       it "should lookup coords based on IP address" do
@@ -86,9 +78,8 @@ describe QuestionsController do
       
       it "assigns @coords" do
         coords_split = coords.split(',')
-        location.stub_chain(:ll, :split).and_return(coords_split)
         get :index
-        assigns[:coords].should == coords_split
+        assigns[:coords].should == coords
       end
       
       it "assigns @location" do
@@ -103,6 +94,7 @@ describe QuestionsController do
   describe "GET new" do
     before do
       controller.stub(:authenticate_user!).and_return(true)
+      current_user.stub(:ll).and_return(coords)
     end
     
     it "should be successful" do
@@ -122,7 +114,7 @@ describe QuestionsController do
     end
     
     it "assigns @coords" do
-      current_user.stub(:coords).and_return(coords)
+      current_user.stub(:ll).and_return(coords)
       get :new
       assigns[:coords].should == coords
     end
@@ -130,7 +122,7 @@ describe QuestionsController do
     context "when params[:coords] exists" do
       it "assigns @coords to the coords parameter" do
         get :new, :coords => coords
-        assigns[:coords].should == coords.split(',')
+        assigns[:coords].should == coords
       end
     end
   end
@@ -159,7 +151,7 @@ describe QuestionsController do
       
       it "should redirect to show" do
         post :create, :question => @attr
-        response.should redirect_to(question_path(:sequence => question.sequence,
+        response.should redirect_to(question_path(:id => question.sequence,
                                                   :slug => question.slug ))
       end
     end
@@ -184,7 +176,7 @@ describe QuestionsController do
   describe "GET edit" do
     before do
       controller.stub(:authenticate_user!).and_return(true)
-      Question.stub(:where).and_return(question)
+      Question.stub(:find).and_return(question)
     end
     
     it "should be successful" do
@@ -193,7 +185,7 @@ describe QuestionsController do
     end
     
     it "finds the requested Question" do
-      Question.should_receive(:where).with( :_id => question.id)
+      Question.should_receive(:find).with(question.id)
       get :edit, :id => question.id
     end
     
@@ -210,52 +202,52 @@ describe QuestionsController do
   
   describe "GET show" do
     before do 
-      Question.stub(:where).and_return(question)
+      Question.stub(:find).and_return(question)
     end
     
     it "should be successful" do
-      get :show, :sequence => question.sequence, :slug => question.slug
+      get :show, :id => question.id, :slug => question.slug
       response.should be_success
     end
     
     it "finds the requested Question" do
-      Question.should_receive(:where).with(:sequence => question.sequence,
-                                           :slug => question.slug)
-      get :show, :sequence => question.sequence, :slug => question.slug
+      Question.should_receive(:find).with(question.id)
+      get :show, :id => question.id, :slug => question.slug
     end
     
     it "assigns @qustion" do
-      get :show, :sequence => question.sequence, :slug => question.slug
+      get :show, :id => question.id, :slug => question.slug
       assigns[:question].should == question
     end
     
     it "assigns @coords" do
-      question.stub(:coords).and_return(coords)
-      get :show, :sequence => question.sequence, :slug => question.slug
-      assigns[:coords].should == coords
+      question.stub(:latitude).and_return(50)
+      question.stub(:longitude).and_return(40)
+      get :show, :id => question.id, :slug => question.slug
+      assigns[:coords].should == "50,40"
     end
     
     it "creates a new Answer" do
       Answer.should_receive(:new)
-      get :show, :sequence => question.sequence, :slug => question.slug
+      get :show, :id => question.id, :slug => question.slug
     end
     
     it "assigns @new_answer" do
       new_answer = Answer.new
       Answer.stub(:new).and_return(new_answer)
-      get :show, :sequence => question.sequence, :slug => question.slug
+      get :show, :id => question.id, :slug => question.slug
       assigns[:new_answer].should == new_answer
     end
     
     it "assigns @answers" do
       answers = [mock_model(Answer)]
-      question.stub_chain(:answers, :order_by).and_return(answers)
-      get :show, :sequence => question.sequence, :slug => question.slug
+      question.stub_chain(:answers, :order).and_return(answers)
+      get :show, :id => question.id, :slug => question.slug
       assigns[:answers].should == answers
     end
     
     it "renders the correct template" do
-      get :show, :sequence => question.sequence, :slug => question.slug
+      get :show, :id => question.id, :slug => question.slug
       response.should render_template(:show)
     end
   end

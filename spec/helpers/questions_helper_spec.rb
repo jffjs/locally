@@ -14,7 +14,7 @@ describe QuestionsHelper do
   describe "#question_pretty_path" do
     it "creates an SEO friendly path to the question" do
       question = mock_model(Question)
-      question.stub(:sequence).and_return(113)
+      question.stub(:id).and_return(113)
       question.stub(:slug).and_return("this-is-a-question-slug")
       question_pretty_path(question).should == "/questions/113/this-is-a-question-slug"
     end

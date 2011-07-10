@@ -3,15 +3,24 @@ class AnswersController < ApplicationController
   
   # POST /answers
   def create
-    @question = Question.where(:sequence => params[:question_id]).first
-    answer = Answer.new(params[:answer])
+    @question = Question.find(params[:question_id])
+    #answer = Answer.new(params[:answer])
     # Look up Place by reference and add it to the answer
-    place = Place.find_by_google_ref(params[:place_ref])
-    answer.place = place
-    @question.answers << answer
-    @question.answerers << current_user
-    current_user.answered_questions << @question
+    place = Place.find_by_google_ref(params[:place_ref]) unless params[:place_ref].blank?
+    #answer.place = place
+    #@question.answers << answer
+    #@question.answerers << current_user
+    #current_user.answered_questions << @question
 
-    redirect_to question_pretty_path(@question)
+    @answer = Answer.new(params[:answer])
+    @answer.place = place
+    @answer.question = @question
+    @answer.user = current_user
+    
+    if @answer.save
+      redirect_to question_pretty_path(@question)
+    else
+      render 'questions#show'
+    end
   end
 end

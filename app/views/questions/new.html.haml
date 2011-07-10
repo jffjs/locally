@@ -2,5 +2,5 @@
 = render :partial => 'map_search_control'
 = form_for @question do |f|
   = f.text_field  :content
-  = f.hidden_field :coords
+  = f.hidden_field :ll
   = f.submit  "Submit"

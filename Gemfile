@@ -6,15 +6,12 @@ gem 'rails', '3.1.0.rc4'
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
 
 gem 'sqlite3'
-gem 'mongoid', "~> 2.0"
-gem 'mongoid_geo'
-gem 'mongoid_auto_inc'
-gem 'bson_ext', "~> 1.3"
 
 gem 'devise'
 gem 'haml'
 gem 'simple_form'
 gem 'geokit'
+gem 'geocoder'
 gem 'google_places'
 
 # Asset template engines

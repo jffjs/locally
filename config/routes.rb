@@ -1,12 +1,8 @@
 Locally::Application.routes.draw do
   devise_for :users
-
   match 'home' => 'pages#index', :as => 'home'
-  
-  resources :questions, :except => [:show]
-  
-  match 'questions/:sequence/:slug' => 'questions#show', :as => 'question'
-  
+  match 'questions/:id/:slug' => 'questions#show', :as => 'question'
+  resources :questions, :except => [:show] 
   resources :places,    :only => [:index]
   resources :answers,   :only => [:create, :destroy]
   

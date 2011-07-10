@@ -5,7 +5,7 @@ for(i in map.markers) {
 }
 <% @places.each do |place| %>
 	map.markers.push(new google.maps.Marker({
-		position: new google.maps.LatLng(<%= place.coords[0] %>,<%= place.coords[1] %>),
+		position: new google.maps.LatLng(<%= place.latitude %>,<%= place.longitude %>),
 		map: map,
 		title: "<%= place.name %>"
 	}));
