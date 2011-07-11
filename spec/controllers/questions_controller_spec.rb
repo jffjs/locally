@@ -25,12 +25,11 @@ describe QuestionsController do
     
     context "when params[:location] exists" do
       before do
-        Geokit::Geocoders::GoogleGeocoder.stub_chain(:geocode, :ll)
-          .and_return(coords)
+        controller.stub(:geocode).and_return(coords)
       end
       
       it "should invoke the Google geocoder" do
-        Geokit::Geocoders::GoogleGeocoder.should_receive(:geocode).with("Lansing, MI")
+        controller.should_receive(:geocode).with("Lansing, MI")
         get :index, :location => "Lansing, MI"
       end
       it "assigns @coords" do
@@ -67,17 +66,17 @@ describe QuestionsController do
       
       before do
         controller.stub(:user_signed_in?).and_return(false)
-        Geokit::Geocoders::IpGeocoder.stub(:geocode).and_return(location)
-        location.stub(:ll).and_return(coords)
+        Geocoder.stub_chain(:search, :first).and_return(location)
+        location.stub(:latitude).and_return(80.0)
+        location.stub(:longitude).and_return(50.0)
       end
       
       it "should lookup coords based on IP address" do
-        Geokit::Geocoders::IpGeocoder.should_receive(:geocode)
+        Geocoder.should_receive(:search)
         get :index
       end
       
       it "assigns @coords" do
-        coords_split = coords.split(',')
         get :index
         assigns[:coords].should == coords
       end
@@ -180,7 +179,7 @@ describe QuestionsController do
     end
     
     it "should be successful" do
-      get :edit, :id => question.id
+      get :edit, :id => question
       response.should be_success
     end
     

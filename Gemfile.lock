@@ -60,7 +60,6 @@ GEM
       factory_girl (~> 1.3)
       railties (>= 3.0.0)
     geocoder (1.0.2)
-    geokit (1.6.0)
     google_places (0.0.3)
       httparty
     haml (3.1.2)
@@ -157,7 +156,6 @@ DEPENDENCIES
   fabrication
   factory_girl_rails
   geocoder
-  geokit
   google_places
   haml
   jquery-rails

@@ -10,7 +10,6 @@ gem 'sqlite3'
 gem 'devise'
 gem 'haml'
 gem 'simple_form'
-gem 'geokit'
 gem 'geocoder'
 gem 'google_places'
 

@@ -4,16 +4,16 @@ class QuestionsController < ApplicationController
   # GET /questions
   def index
     if params[:location]
-      @coords = Geokit::Geocoders::GoogleGeocoder.geocode(params[:location]).ll
+      @coords = geocode(params[:location])
       @location = params[:location]
     elsif user_signed_in?
       @coords = current_user.ll
       @location = current_user.location
     else
       # TODO: change IP address to request.remote_ip when you deploy
-      location = Geokit::Geocoders::IpGeocoder.geocode("24.11.161.183")
-      @coords = location.ll
-      @location = "#{location.city} #{location.state}"
+      result = Geocoder.search("24.11.161.183").first
+      @coords = "#{result.latitude},#{result.longitude}"
+      @location = "#{result.city} #{result.state}"
     end
     
     #TODO: make a scope for this query
@@ -71,13 +71,5 @@ class QuestionsController < ApplicationController
     else
       render :new
     end
-  end
-  
-  private
-  
-  # Splits a lat,lng string into an array of floats
-  # e.g. "20.0,-50.0" => [20.0, -50.0]
-  def split_ll(ll_string)
-    ll_string.split(/ |,/).map { |l| l.to_f }
   end
 end
